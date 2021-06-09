@@ -173,5 +173,23 @@ B站课程连接：[C++面向对象高级编程(上)-基于对象＆面向对象
 
 ## 组合和继承
 
-1. 复合，表示has a
+1. 复合，表示has-a，构造由内而外，析构由外而内
 2. adapter 适配器
+3. 委托，delegation，Composition by reference，编译防火墙
+4. 写时复制
+5. 继承 is-a，构造由内而外，析构由外而内，base class的dtor必须是virtual，否则会出现undefined behavior
+
+
+
+## Inheritance with virtual functions
+
+1. 子类继承了父类的成员函数，实际上是继承了父类成员函数的调用权，子类可以调用父类的成员函数
+
+2. 成员函数：
+
+   ![](https://i.loli.net/2021/06/09/UxkPGSTIC9Ep2b1.png)
+
+3. Template Method
+
+4. 继承和复合组合下的构造与析构
+
