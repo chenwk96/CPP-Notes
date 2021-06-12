@@ -2,9 +2,11 @@
 
 侯捷C++面向对象高级编程课程过程中的一些记录，不能称之为笔记。
 
-B站课程连接：[C++面向对象高级编程(上)-基于对象＆面向对象_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Lb4y1R7fs?p=3&spm_id_from=pageDriver)
+B站课程连接：
 
+[C++面向对象高级编程(上)-基于对象＆面向对象_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Lb4y1R7fs?p=3&spm_id_from=pageDriver)
 
+[C++面向对象高级编程(下)-兼谈对象模型（完结）_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1ZX4y157Bu?p=2&spm_id_from=pageDriver)
 
 ## C++编程简介
 
@@ -194,4 +196,109 @@ B站课程连接：[C++面向对象高级编程(上)-基于对象＆面向对象
 4. 继承和复合组合下的构造与析构
 
 5. 观察者设计模式
+
+
+
+## 转换函数
+
+1. 没有返回类型，通常都会添上`const`
+
+   ![](https://i.loli.net/2021/06/10/rQanMb7214VsG8J.png)
+
+2. 一个类可以有有多个转换函数，只要合理
+
+3. 转换函数的类型可以是自定义类型
+
+
+
+## non-explicit-one-argument ctor
+
+1. argument和parameter有区别
+
+   ![](https://i.loli.net/2021/06/10/iDAHSZctByrTj8u.png)
+
+2. ambiguous，因二义而报错（将转换函数和non-explicit-one-argument ctor两张ppt内容合在一起就会发生ambiguous）
+
+
+
+## explicit-one-argument ctor
+
+![](https://i.loli.net/2021/06/10/84jnLFBWPDYHNTO.png)
+
+
+
+## pointer-like classes
+
+1. 有关智能指针
+2. 有关迭代器
+
+
+
+## function-like classes, 所谓仿函数
+
+1. 重载`operator ()`
+2. 标准库中有很多仿函数，都有继承一些base classe（unary_functon、binary_function）
+
+
+
+## namespace
+
+
+
+## class template，类模板
+
+
+
+## function templ，函数模板
+
+```c++
+template <class T> // template <typename T>
+inline
+const T& min(const T& a, const T& b) {
+    return b < a ? b : a;
+}
+```
+
+
+
+## 成员模板
+
+1. 子类初始化父类，反之不行（向上转型）
+
+
+
+## specialization 模板特化
+
+
+
+## partial specialization 偏特化
+
+1. 个数上的偏
+2. 范围上的偏
+
+
+
+## 模板模板参数
+
+很懵
+
+
+
+## variadic templates(since C++11) 
+
+
+
+## reference
+
+1. 引用底层实现都是指针，但从逻辑角度讲，引用就是别名，类型和引用的类型一样（底层为指针）
+2. 引用一定要有初值，之后就无法再改变去重新代表别的东西
+
+> const函数可以被非const对象和const对象调用，如果重载了同名同参数类型的非const函数，非const对象会优先调用非const函数，const对象只会调用const函数，两种函数可共存。
+
+
+
+##  对象模型：关于vptr和vtbl
+
+1. 虚函数？
+2. 静态绑定、动态绑定
 
