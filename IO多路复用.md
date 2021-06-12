@@ -67,11 +67,11 @@ int select(int nfds, fd_set* readfds, fd_set* writfds,
 * 如果集合中的标志位为 0 代表不检测这个文件描述符状态
 * 如果集合中的标志位为 1 代表检测这个文件描述符状态
 
-<img src="https://i.loli.net/2021/06/12/ODA8hPva9iQLW6J.png" style="zoom: 33%;" />
+<img src="https://i.loli.net/2021/06/12/ODA8hPva9iQLW6J.png" style="zoom: 25%;" />
 
 内核在遍历这个读集合的过程中，如果被检测的文件描述符对应的读缓冲区中没有数据，内核将修改这个文件描述符在读集合 `fd_set` 中对应的标志位，改为 0，如果有数据那么这个标志位的值不变，还是 1。
 
-<img src="https://i.loli.net/2021/06/12/GJajAkUqm3rlSWB.png" style="zoom: 33%;" />
+<img src="https://i.loli.net/2021/06/12/GJajAkUqm3rlSWB.png" style="zoom: 25%;" />
 
 当 `select() `函数解除阻塞之后，被内核修改过的读集合通过参数传出，此时集合中只要标志位的值为 1，那么它对应的文件描述符肯定是就绪的，我们就可以基于这个文件描述符和客户端建立新连接或者通信了。
 
@@ -124,7 +124,7 @@ void FD_ZERO(fd_set *set);
 
 7. 重复第 6 步
 
-<img src="https://i.loli.net/2021/06/12/BzerAKwc2QW7gtZ.png" style="zoom: 45%;" />
+<img src="https://i.loli.net/2021/06/12/BzerAKwc2QW7gtZ.png" style="zoom: 25%;" />
 
 >timeout时也可以根据需求，和图中不一样，继续进行检测。
 
@@ -204,5 +204,16 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 
 内核会根据第二个参数传递的值对参数 1 数组中的文件描述符进行线性遍历，这一点和 select 也是类似的。
 
+
+
 ## epoll
 
+epoll全称evenpoll，是linux内核实现I/O多路复用的一个实现，epoll 是 select 和 poll 的升级版，相较于这两个前辈，epoll 改进了工作方式，因此它更加高效。
+
+* 对于待检测集合select和poll是基于线性方式处理的，epoll是基于红黑树来管理待检测集合的。
+* select和poll每次都会线性扫描整个待检测集合，集合越大速度越慢，epoll使用的是==回调机制==，效率高，处理效率也不会随着检测集合的变大而下降
+* select和poll工作过程中存在内核/用户空间数据的频繁拷贝问题，==在epoll中内核和用户区使用的是**共享内存**（基于mmap内存映射区实现）==，省去了不必要的内存拷贝。
+* 使用者需要对select和poll返回的集合进行判断才能知道哪些文件描述符是就绪的，通过epoll可以直接得到已就绪的文件描述符集合，无需再次检测
+* 使用 epoll 没有最大文件描述符的限制，仅受系统中进程能打开的最大文件数目限制
+
+当多路复用的文件数量庞大、IO 流量频繁的时候，一般不太适合使用` select () `和 `poll ()`，这种情况下` select () `和` poll () `表现较差，推荐使用 `epoll ()`。
