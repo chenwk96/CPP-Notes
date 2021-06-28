@@ -168,6 +168,46 @@ int main()
 
 
 
+### 移动构造函数和移动赋值运算符
+
+移动构造函数的第一个参数是右值引用，移动构造函数必须确保移动后源对象处于一个销毁他是无害的状态。一旦资源完成移动，源对象必须不再指向被移动的资源（这些资源的所有权已经归属新创建的对象）。
+
+```c++
+StrVec::StrVec(StrVec &&s) noexcept // 移动操作不应该抛出任何异常
+    : elements(s.elements), first_free(s.first_free), cap(s.cap) {
+        s.elements = s.first_free = s.caps = nullptr; // 没有这一步，销毁源对象会释放掉移动的内存
+    }
+
+StrVec& StrVec::opreator=(StrVec &&rhs) noexcept {
+    if (this != rhs) {
+        free();			// 释放已有元素
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.caps = nullptr;
+    }
+    return *this;
+}
+```
+
+只有当一个类没有定义任何自己版本的拷贝控制函数，且类的每个非static数据成员都可以移动时，编译器才会为他合成移动构造函数或者移动赋值运算符。
+
+```c++
+// 编译器会为X和hasX合成移动操作
+struct X {
+	int i;
+    std::string s; // string定义了自己的移动操作
+};
+
+struct has {
+	X men;   // X 有合成的移动操作
+};
+```
+
+> 定义了移动构造函数和移动赋值运算符的类必须也要定义自己的拷贝操作，否则，默认的拷贝构造函数和拷贝赋值运算符是默认定义为删除的。
+
+
+
 ### 智能指针
 
 #### shared_ptr
@@ -276,44 +316,4 @@ unique_ptr<int> clone(int p) {
     return unique_ptr<int>(new int(p)); // right! 移动构造
 }
 ```
-
-
-
-### 移动构造函数和移动赋值运算符
-
-移动构造函数的第一个参数是右值引用，移动构造函数必须确保移动后源对象处于一个销毁他是无害的状态。一旦资源完成移动，源对象必须不再指向被移动的资源（这些资源的所有权已经归属新创建的对象）。
-
-```c++
-StrVec::StrVec(StrVec &&s) noexcept // 移动操作不应该抛出任何异常
-    : elements(s.elements), first_free(s.first_free), cap(s.cap) {
-        s.elements = s.first_free = s.caps = nullptr; // 没有这一步，销毁源对象会释放掉移动的内存
-    }
-
-StrVec& StrVec::opreator=(StrVec &&rhs) noexcept {
-    if (this != rhs) {
-        free();			// 释放已有元素
-        elements = rhs.elements;
-        first_free = rhs.first_free;
-        cap = rhs.cap;
-        rhs.elements = rhs.first_free = rhs.caps = nullptr;
-    }
-    return *this;
-}
-```
-
-只有当一个类没有定义任何自己版本的拷贝控制函数，且类的每个非static数据成员都可以移动时，编译器才会为他合成移动构造函数或者移动赋值运算符。
-
-```c++
-// 编译器会为X和hasX合成移动操作
-struct X {
-	int i;
-    std::string s; // string定义了自己的移动操作
-};
-
-struct has {
-	X men;   // X 有合成的移动操作
-};
-```
-
-> 定义了移动构造函数和移动赋值运算符的类必须也要定义自己的拷贝操作，否则，默认的拷贝构造函数和拷贝赋值运算符是默认定义为删除的。
 
