@@ -4,7 +4,7 @@ C++ 一些记录，平时遇见的就直接在readme中记录
 
 
 
-### 函数名、函数名取地址以及函数指针
+## 函数名、函数名取地址以及函数指针
 
 ```c++
 #include <stdio.h>
@@ -67,11 +67,11 @@ void useBigger(const string& s1, const string& s2, FuncP2);
 
 
 
-### new
+## new
 
 在C++中提到new，至少可能代表以下三种含义：**new operator**，**operator new**，**placement new**
 
-#### new operator
+### new operator
 
 **new operator** 就是 **new** 操作符，不能被重载，也就是我们平常用的new
 
@@ -90,7 +90,7 @@ pf = static_cast<Foo*>(buff);
 pf -> Foo::Foo();
 ```
 
-#### operator new
+### operator new
 
 **operator new** 是函数，可以被重载，new operator 调用它用来分配内存，**通过重载它，可以改变 new operator 的功能**，默认有三种：
 
@@ -110,7 +110,7 @@ void* operator new (std::size_t size, void* ptr) throw();
 2. 重载时，第一个参数类型必须为表达**要求分配空间的大小**（字节），类型为 **size_t**
 3. 重载时，可以带其它参数
 
-#### placement new
+### placement new
 
 **placement new** 它实现了**在指定内存地址上用指定类型的构造函数来构造一个对象**的功能，这块指定的地址既可以是栈，又可以是堆，placement 对此不加区分
 
@@ -147,7 +147,7 @@ int main()
 
 
 
-### 对象移动
+## 对象移动
 
 问题：`vector<string>`在重新分配内存的过程中，从旧内存将元素拷贝到新内存是不必要的，原因是拷贝后对象就立即销毁了，这样的话拷贝是极为低效的。移动而非拷贝对象会大幅的提高性能。
 
@@ -208,9 +208,9 @@ struct has {
 
 
 
-### 智能指针
+## 智能指针
 
-#### shared_ptr
+### shared_ptr
 
 ```c++
 // shared_ptr 独有操作
@@ -272,7 +272,7 @@ int *q = p.get();
 int foo = *p; // 未定义：p指向的内存已经被释放
 ```
 
-#### unique_ptr
+### unique_ptr
 
 与shared_ptr不同，某个时刻只能有一个unique_ptr指向一个给定对象，当unique_ptr被销毁时，它所指向的对象也被销毁。没有类似make_shared的标准库函数返回一个unique_ptr。定义是需要将其绑定到一个new返回的指针上。
 
@@ -316,4 +316,82 @@ unique_ptr<int> clone(int p) {
     return unique_ptr<int>(new int(p)); // right! 移动构造
 }
 ```
+
+
+
+## lambda 表达式
+
+函数式编程的概念。
+
+C++ 使用了"**[]**"，称为“**lambda引出符**”来形成lambda表达式。
+
+```C++
+auto f1 = [](){};  // 相当于空函数，什么都不做
+
+// ( )内声明入口参数
+// { }定义函数体
+// [ ]内进行变量捕捉 
+
+// lambda 嵌套
+auto f2 = [](){
+    std::cout << "lambda f2" << std::endl;
+    
+    auto f3 = [](int x) {
+        return x * x;
+    };
+    
+    std::cout << f3(10) << std::endl;
+}
+
+// 每个 lambda 表达式都会有一个独特的类型，该类型只有编译器知道，必须要用auto
+
+// "匿名"使用lambda表达式
+vector<int> v = {3, 1, 8, 5, 0};
+std::cout << *find_if(begin(v), end(v),  // 标准容器里的查找算法
+				[](int x) {				 // 匿名lambda表达式，不需要auto赋值
+                	return x >= 5;		 // 用作算法的判断条件
+            	}
+        	  )
+     	  << std::endl;
+```
+
+**lambda的变量捕获**
+
+* "[=]"表示按值捕获所有变量，表达式内部是值的拷贝，并且不能修改；
+* "[&]"表示按引用捕获所有变量，内部以引用的方式使用，可以修改；
+* 在"[]"里明确写出外部变量名，指定按值或者按引用捕获。
+
+```C++
+int x = 33;
+
+auto f1 = [=]() {
+    // x += 10;			// x 只读， 不允许修改
+};
+
+autp f2 = [&]() {
+    x += 10;
+};
+
+auto f3 = [=, &x]() {   // 按引用捕获x，其余用值捕获
+  	x += 20;  
+};
+```
+
+**泛型的lambda**
+
+C++14里，lambda可以实现泛型化
+
+```C++
+auto f = [](const auto& x) {    // 参数使用auto声明，泛型化
+    return x + x;
+};
+
+cout << f(3) << endl;
+couy << f(0,618) << endl;
+
+string str = "matrix";
+cout << f(str) << endl;
+```
+
+
 
